@@ -36,7 +36,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 50%, transparent);
   border: 1px solid var(--border);
   border-radius: 16px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
@@ -124,6 +124,7 @@ body { background: #1d4410; }
 
   position: fixed;
   inset: 0;
+  cursor: grab;       /* open palm: stroking the grass */
   z-index: 0;         /* not -1: then <body> sits on top and swallows :hover */
   display: grid;
   grid-template-columns: repeat(50, var(--cell));
