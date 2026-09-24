@@ -1,0 +1,192 @@
+:root {
+  --bg: #faf8f5;
+  --surface: #ffffff;
+  --text: #1f1d1a;
+  --muted: #6b665e;
+  --accent: #d97757;
+  --border: #e7e2da;
+  --box-size: 30px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #171614;
+    --surface: #22201d;
+    --text: #f2efe9;
+    --muted: #a39d93;
+    --accent: #e08a6c;
+    --border: #34312c;
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ---------- Radio widget: fixed bottom-right, above everything ---------- */
+.radio {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 2147483647;
+  width: 224px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+  font-size: 13px;
+}
+.radio .head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.radio .title { font-weight: 650; }
+.radio .live { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+.radio .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
+.radio.playing .dot { background: var(--accent); animation: radio-pulse 1.6s infinite; }
+@keyframes radio-pulse { 50% { opacity: .3; } }
+.radio.muted .live { color: var(--accent); font-weight: 600; animation: radio-pulse 1.6s infinite; }
+
+/* 200x200 is the smallest player YouTube's terms allow */
+.radio .screen { position: relative; width: 200px; height: 200px; border-radius: 10px; overflow: hidden; background: #000; }
+.radio .screen iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+.radio .controls { display: flex; align-items: center; gap: 10px; }
+.radio .play {
+  flex: none;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  display: grid; place-items: center;
+}
+.radio .play:disabled { opacity: .5; cursor: wait; }
+.radio .play svg { width: 18px; height: 18px; fill: currentColor; }
+.radio .bars { display: flex; align-items: flex-end; gap: 2px; height: 18px; width: 40px; flex: none; }
+.radio .bars span { flex: 1; height: 20%; background: var(--border); border-radius: 1px; }
+.radio.playing .bars span { background: var(--accent); animation: radio-eq 1s ease-in-out infinite alternate; }
+@keyframes radio-eq { to { height: 100%; } }
+.radio input[type=range] { flex: 1; min-width: 0; accent-color: var(--accent); }
+.radio a { color: var(--muted); font-size: 11px; }
+
+.box{
+  border: black solid 1px;
+  display: grid; 
+  place-items: center;
+}
+
+body > .box {
+    width: var(--box-size);
+    height: var(--box-size);
+  }
+
+.box > .box {
+    width: 80%;
+    height: 80%;
+}
+
+.container{
+  --s: 30px;
+  --g: 10px;
+
+  display: grid;
+  grid-template-columns: repeat(10, minmax(var(--s), 1fr));
+  gap: var(--g);
+  overflow: hidden;
+}
+
+.container > * {
+  /* the actual element */
+  --x: ;
+  --y: ; 
+
+  /* the hovered element */
+  --i: ;
+  --j: ;
+}
+
+/* ---------- Playground: grass that leans toward the cursor (no JS) ---------- */
+/* The screen is a grid of <i> cells, 50 per row (48 visible + 2 hidden off
+   the right edge, so neighbour offsets that wrap around a row land off-screen).
+   Only the hovered cell's neighbours restyle: they are reached with sibling
+   selectors (i:hover + i + ..., i:has(+ i + ... + i:hover)), and each neighbour
+   within ~100px gets a precomputed angle toward the cursor in --a.
+   The static conic-gradient lawn underneath keeps the grass dense. */
+body { background: #1d4410; }
+
+.grass {
+  --cell: calc(100vw / 48);
+
+  position: fixed;
+  inset: 0;
+  z-index: 0;         /* not -1: then <body> sits on top and swallows :hover */
+  display: grid;
+  grid-template-columns: repeat(50, var(--cell));
+  grid-template-rows: repeat(30, 1fr);   /* 30 rows always fill the height, whatever the aspect ratio */
+  overflow: hidden;
+  background:
+    conic-gradient(from 175deg at 50% 0, #8fd45e 0 10deg, #0000 0) 3px 7px / 17px 38px,
+    conic-gradient(from 174deg at 50% 0, #6fbf4a 0 12deg, #0000 0) 0 0 / 9px 34px,
+    conic-gradient(from 175deg at 50% 0, #4e9a2f 0 10deg, #0000 0) 4px 11px / 13px 46px,
+    conic-gradient(from 173deg at 50% 0, #3d7f24 0 14deg, #0000 0) 7px 5px / 11px 40px,
+    linear-gradient(#2c5e18, #1d4410);
+}
+
+.grass > i { position: relative; --a: 0deg; }
+
+.grass > i::before,
+.grass > i::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 25%;
+  width: 7px;
+  height: 150%;
+  background: linear-gradient(to top, #2f6a1b, #8fd45e);
+  clip-path: polygon(0 100%, 50% 0, 100% 100%);
+  transform-origin: 50% 100%;
+  transform: rotate(calc(var(--a) + var(--tilt, 0deg)));
+  transition: transform .15s ease-out;
+  pointer-events: none;
+}
+.grass > i::after {
+  left: 60%;
+  width: 6px;
+  height: 115%;
+  background: linear-gradient(to top, #3d7f24, #6fbf4a);
+  --tilt: 6deg;
+}
+
+/* a little variety so the lawn doesn't look like a grid */
+.grass > i:nth-child(3n)::before   { height: 180%; --tilt: -5deg; }
+.grass > i:nth-child(5n+1)::after  { height: 140%; --tilt: -8deg; }
+.grass > i:nth-child(7n+2)::before { left: 10%; background: linear-gradient(to top, #2c5e18, #a3de6e); }
+.grass > i:nth-child(4n+3)::after  { left: 75%; }
+
+/* --- generated: neighbours of the hovered cell lean toward it ---
+   (dx, dy) = neighbour's offset in cells; angle = atan2(-dx, |dy|), clamped to ±70deg */
+/* dx=-1 dy=-2 */ .grass > i:has(+ i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i:hover) { --a: 27deg; }
+/* dx=0 dy=-2 */ .grass > i:has(+ i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i:hover) { --a: -0deg; }
+/* dx=1 dy=-2 */ .grass > i:has(+ i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i:hover) { --a: -27deg; }
+/* dx=-2 dy=-1 */ .grass > i:has(+ i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i:hover) { --a: 63deg; }
+/* dx=-1 dy=-1 */ .grass > i:has(+ i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i:hover) { --a: 45deg; }
+/* dx=0 dy=-1 */ .grass > i:has(+ i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i:hover) { --a: -0deg; }
+/* dx=1 dy=-1 */ .grass > i:has(+ i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i:hover) { --a: -45deg; }
+/* dx=2 dy=-1 */ .grass > i:has(+ i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i:hover) { --a: -63deg; }
+/* dx=-2 dy=0 */ .grass > i:has(+ i + i:hover) { --a: 70deg; }
+/* dx=-1 dy=0 */ .grass > i:has(+ i:hover) { --a: 70deg; }
+/* dx=1 dy=0 */ .grass > i:hover + i { --a: -70deg; }
+/* dx=2 dy=0 */ .grass > i:hover + i + i { --a: -70deg; }
+/* dx=-2 dy=1 */ .grass > i:hover + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i { --a: 63deg; }
+/* dx=-1 dy=1 */ .grass > i:hover + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i { --a: 45deg; }
+/* dx=0 dy=1 */ .grass > i:hover + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i { --a: -0deg; }
+/* dx=1 dy=1 */ .grass > i:hover + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i { --a: -45deg; }
+/* dx=2 dy=1 */ .grass > i:hover + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i { --a: -63deg; }
+/* dx=-1 dy=2 */ .grass > i:hover + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i { --a: 27deg; }
+/* dx=0 dy=2 */ .grass > i:hover + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i { --a: -0deg; }
+/* dx=1 dy=2 */ .grass > i:hover + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i { --a: -27deg; }
