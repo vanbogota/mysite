@@ -48,7 +48,9 @@ body {
 .radio .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
 .radio.playing .dot { background: var(--accent); animation: radio-pulse 1.6s infinite; }
 @keyframes radio-pulse { 50% { opacity: .3; } }
-.radio.muted .live { color: var(--accent); font-weight: 600; animation: radio-pulse 1.6s infinite; }
+.radio.muted .live { color: #fff; background: var(--accent); font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; box-shadow: 0 1px 4px rgb(0 0 0 / .3); animation: radio-nudge 1.6s ease-in-out infinite; }
+.radio.muted .dot { background: #fff; }
+@keyframes radio-nudge { 50% { transform: scale(1.08); } }
 
 /* 200x200 is the smallest player YouTube's terms allow */
 .radio .screen { position: relative; width: 200px; height: 200px; border-radius: 10px; overflow: hidden; background: #000; }
@@ -73,6 +75,7 @@ body {
 @keyframes radio-eq { to { height: 100%; } }
 .radio input[type=range] { flex: 1; min-width: 0; accent-color: var(--accent); }
 .radio a { color: var(--muted); font-size: 11px; }
+.radio a.radio-linkedin { color: #000; font-weight: 700; font-size: 13px; }
 
 .box{
   border: black solid 1px;
