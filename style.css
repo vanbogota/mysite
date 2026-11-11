@@ -113,84 +113,41 @@ body > .box {
   --j: ;
 }
 
-/* ---------- Playground: grass that leans toward the cursor (no JS) ---------- */
-/* The screen is a grid of <i> cells, 50 per row (48 visible + 2 hidden off
-   the right edge, so neighbour offsets that wrap around a row land off-screen).
-   Only the hovered cell's neighbours restyle: they are reached with sibling
-   selectors (i:hover + i + ..., i:has(+ i + ... + i:hover)), and each neighbour
-   within ~100px gets a precomputed angle toward the cursor in --a.
-   The static conic-gradient lawn underneath keeps the grass dense. */
-body { background: #1d4410; }
+/* ---------- Playground: three.js meadow (see the module script in index.html) ---------- */
+body { background: #1a330c; }
 
 .grass {
-  --cell: calc(100vw / 48);
-
   position: fixed;
   inset: 0;
-  cursor: grab;       /* open palm: stroking the grass */
-  z-index: 0;         /* not -1: then <body> sits on top and swallows :hover */
-  display: grid;
-  grid-template-columns: repeat(50, var(--cell));
-  grid-template-rows: repeat(30, 1fr);   /* 30 rows always fill the height, whatever the aspect ratio */
-  overflow: hidden;
-  background:
-    conic-gradient(from 175deg at 50% 0, #8fd45e 0 10deg, #0000 0) 3px 7px / 17px 38px,
-    conic-gradient(from 174deg at 50% 0, #6fbf4a 0 12deg, #0000 0) 0 0 / 9px 34px,
-    conic-gradient(from 175deg at 50% 0, #4e9a2f 0 10deg, #0000 0) 4px 11px / 13px 46px,
-    conic-gradient(from 173deg at 50% 0, #3d7f24 0 14deg, #0000 0) 7px 5px / 11px 40px,
-    linear-gradient(#2c5e18, #1d4410);
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+  touch-action: none;    /* let a finger brush the grass instead of scrolling */
+  /* sky behind the transparent canvas; the bottom stop matches the fog colour */
+  background: linear-gradient(#5d8fca, #c8dade 22%);
 }
 
-.grass > i { position: relative; --a: 0deg; }
-
-.grass > i::before,
-.grass > i::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 25%;
-  width: 7px;
-  height: 150%;
-  background: linear-gradient(to top, #2f6a1b, #8fd45e);
-  clip-path: polygon(0 100%, 50% 0, 100% 100%);
-  transform-origin: 50% 100%;
-  transform: rotate(calc(var(--a) + var(--tilt, 0deg)));
-  transition: transform .15s ease-out;
-  pointer-events: none;
+/* ---------- Liquid-glass sign in the sky (SVG filter #liquid-glass in index.html) ---------- */
+.sign {
+  position: fixed;
+  top: 5vh;
+  left: 0;
+  right: 0;
+  z-index: 1;              /* over the meadow, under the radio */
+  pointer-events: none;    /* the cursor still reaches the grass */
+  text-align: center;
+  text-transform: uppercase;
+  /* two lines that must stay above the horizon (~20% down): capped by both width and height */
+  font: 900 clamp(24px, min(6.5vw, 6vh), 88px)/1.1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: .06em;
+  color: rgb(235 245 255 / .28);   /* the glass body: barely tinted, the sky shows through */
+  filter: url(#liquid-glass);
+  animation: sign-in 5.8s ease-in-out .3s both;
 }
-.grass > i::after {
-  left: 60%;
-  width: 6px;
-  height: 115%;
-  background: linear-gradient(to top, #3d7f24, #6fbf4a);
-  --tilt: 6deg;
+@keyframes sign-in {
+  from { opacity: 0; }
 }
-
-/* a little variety so the lawn doesn't look like a grid */
-.grass > i:nth-child(3n)::before   { height: 180%; --tilt: -5deg; }
-.grass > i:nth-child(5n+1)::after  { height: 140%; --tilt: -8deg; }
-.grass > i:nth-child(7n+2)::before { left: 10%; background: linear-gradient(to top, #2c5e18, #a3de6e); }
-.grass > i:nth-child(4n+3)::after  { left: 75%; }
-
-/* --- generated: neighbours of the hovered cell lean toward it ---
-   (dx, dy) = neighbour's offset in cells; angle = atan2(-dx, |dy|), clamped to ±70deg */
-/* dx=-1 dy=-2 */ .grass > i:has(+ i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i:hover) { --a: 27deg; }
-/* dx=0 dy=-2 */ .grass > i:has(+ i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i:hover) { --a: -0deg; }
-/* dx=1 dy=-2 */ .grass > i:has(+ i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i:hover) { --a: -27deg; }
-/* dx=-2 dy=-1 */ .grass > i:has(+ i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i:hover) { --a: 63deg; }
-/* dx=-1 dy=-1 */ .grass > i:has(+ i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i:hover) { --a: 45deg; }
-/* dx=0 dy=-1 */ .grass > i:has(+ i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i:hover) { --a: -0deg; }
-/* dx=1 dy=-1 */ .grass > i:has(+ i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i:hover) { --a: -45deg; }
-/* dx=2 dy=-1 */ .grass > i:has(+ i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i:hover) { --a: -63deg; }
-/* dx=-2 dy=0 */ .grass > i:has(+ i + i:hover) { --a: 70deg; }
-/* dx=-1 dy=0 */ .grass > i:has(+ i:hover) { --a: 70deg; }
-/* dx=1 dy=0 */ .grass > i:hover + i { --a: -70deg; }
-/* dx=2 dy=0 */ .grass > i:hover + i + i { --a: -70deg; }
-/* dx=-2 dy=1 */ .grass > i:hover + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i { --a: 63deg; }
-/* dx=-1 dy=1 */ .grass > i:hover + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i { --a: 45deg; }
-/* dx=0 dy=1 */ .grass > i:hover + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i { --a: -0deg; }
-/* dx=1 dy=1 */ .grass > i:hover + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i { --a: -45deg; }
-/* dx=2 dy=1 */ .grass > i:hover + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i { --a: -63deg; }
-/* dx=-1 dy=2 */ .grass > i:hover + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i { --a: 27deg; }
-/* dx=0 dy=2 */ .grass > i:hover + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i { --a: -0deg; }
-/* dx=1 dy=2 */ .grass > i:hover + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i + i { --a: -27deg; }
+@media (prefers-reduced-motion: reduce) {
+  .sign { animation: none; }
+}
